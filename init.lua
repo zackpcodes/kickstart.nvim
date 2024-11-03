@@ -1,5 +1,4 @@
-vim.uv.os_setenv("JAVA_HOME", "/usr/bin/jvm/java-17-openjdk")
-
+vim.uv.os_setenv("JAVA_HOME", "/usr/lib/jvm/java-17-openjdk-17.0.13.0.11-3.el9.x86_64")
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
@@ -7,7 +6,7 @@ vim.g.have_nerd_font = true
 
 vim.opt.number = true
 vim.opt.relativenumber = true
-vim.o.statuscolumn = "%s %l %r "
+-- vim.o.statuscolumn = "%s %r "
 
 vim.opt.mouse = "a"
 vim.opt.showmode = false
@@ -41,7 +40,7 @@ vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
 
 vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostic [Q]uickfix list" })
 
-vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
+vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
 vim.keymap.set("n", "<leader>ht", "<cmd>horizontal term<CR>", { desc = "Open horizontal terminal" })
 vim.keymap.set("n", "<leader>vt", "<cmd>vert term<CR>", { desc = "Open vertical terminal" })
 
@@ -73,23 +72,47 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
 
+local one_dark_theme = {
+	normal = {
+		a = { fg = "#282c34", bg = "#98c379", gui = "bold" },
+		b = { fg = "#abb2bf", bg = "#3e4452" },
+		c = { fg = "#abb2bf", bg = "#282c34" },
+	},
+	insert = {
+		a = { fg = "#282c34", bg = "#61afef", gui = "bold" },
+		b = { fg = "#abb2bf", bg = "#3e4452" },
+		c = { fg = "#abb2bf", bg = "#282c34" },
+	},
+	visual = {
+		a = { fg = "#282c34", bg = "#c678dd", gui = "bold" },
+		b = { fg = "#abb2bf", bg = "#3e4452" },
+		c = { fg = "#abb2bf", bg = "#282c34" },
+	},
+	replace = {
+		a = { fg = "#282c34", bg = "#e06c75", gui = "bold" },
+		b = { fg = "#abb2bf", bg = "#3e4452" },
+		c = { fg = "#abb2bf", bg = "#282c34" },
+	},
+	command = {
+		a = { fg = "#282c34", bg = "#d19a66", gui = "bold" },
+		b = { fg = "#abb2bf", bg = "#3e4452" },
+		c = { fg = "#abb2bf", bg = "#282c34" },
+	},
+	terminal = {
+		a = { fg = "#d55fde", bg = "#3e4452", gui = "bold" },
+		b = { fg = "#abb2bf", bg = "#3e4452" },
+		c = { fg = "#abb2bf", bg = "#282c34" },
+	},
+	inactive = {
+		a = { fg = "#abb2bf", bg = "#2c313a", gui = "bold" },
+		b = { fg = "#abb2bf", bg = "#2c313a" },
+		c = { fg = "#abb2bf", bg = "#2c313a" },
+	},
+}
 
 require("lazy").setup({
-	"tpope/vim-sleuth", -- Detect tabstop and shiftwidth automatically
-
-	-- NOTE: Plugins can also be added by using a table,
-	-- with the first argument being the link and the following
-	-- keys can be used to configure plugin behavior/loading/etc.
-	--
-	-- Use `opts = {}` to force a plugin to be loaded.
-	--
-
-	-- Here is a more advanced example where we pass configuration
-	-- options to `gitsigns.nvim`. This is equivalent to the following Lua:
-	--    require('gitsigns').setup({ ... })
-	--
-	-- See `:help gitsigns` to understand what the configuration keys do
-	{ -- Adds git related signs to the gutter, as well as utilities for managing changes
+	"tpope/vim-sleuth",
+	{
 		"lewis6991/gitsigns.nvim",
 		opts = {
 			signs = {
@@ -106,10 +129,7 @@ require("lazy").setup({
 		event = "VimEnter",
 		opts = {
 			icons = {
-				-- set icon mappings to true if you have a Nerd Font
 				mappings = vim.g.have_nerd_font,
-				-- If you are using a Nerd Font: set icons.keys to an empty table which will use the
-				-- default whick-key.nvim defined Nerd Font icons, otherwise define a string table
 				keys = vim.g.have_nerd_font and {} or {
 					Up = "<Up> ",
 					Down = "<Down> ",
@@ -285,7 +305,6 @@ require("lazy").setup({
 			local capabilities = vim.lsp.protocol.make_client_capabilities()
 			capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
 			local servers = {
-				gopls = {},
 				pyright = {},
 				rust_analyzer = {},
 				ts_ls = {},
@@ -333,19 +352,19 @@ require("lazy").setup({
 		},
 		opts = {
 			notify_on_error = false,
-			format_on_save = function(bufnr)
-				local disable_filetypes = { c = true, cpp = true }
-				local lsp_format_opt
-				if disable_filetypes[vim.bo[bufnr].filetype] then
-					lsp_format_opt = "never"
-				else
-					lsp_format_opt = "fallback"
-				end
-				return {
-					timeout_ms = 500,
-					lsp_format = lsp_format_opt,
-				}
-			end,
+			-- format_on_save = function(bufnr)
+			-- 	local disable_filetypes = { c = true, cpp = true }
+			-- 	local lsp_format_opt
+			-- 	if disable_filetypes[vim.bo[bufnr].filetype] then
+			-- 		lsp_format_opt = "never"
+			-- 	else
+			-- 		lsp_format_opt = "fallback"
+			-- 	end
+			-- 	return {
+			-- 		timeout_ms = 500,
+			-- 		lsp_format = lsp_format_opt,
+			-- 	}
+			-- end,
 			formatters_by_ft = {
 				lua = { "stylua" },
 				javascript = { "prettierd", "prettier", stop_after_first = true },
@@ -414,6 +433,9 @@ require("lazy").setup({
 	{
 		"olimorris/onedarkpro.nvim",
 		priority = 1000,
+		config = function()
+			require("onedarkpro").setup({ options = { highlight_inactive_windows = true } })
+		end,
 		init = function()
 			vim.cmd.colorscheme("onedark")
 			vim.cmd.hi("Comment gui=none")
@@ -447,15 +469,18 @@ require("lazy").setup({
 				},
 			})
 			require("mini.surround").setup()
-			local statusline = require("mini.statusline")
-			statusline.setup({ use_icons = vim.g.have_nerd_font })
-
-			---@diagnostic disable-next-line: duplicate-set-field
-			statusline.section_location = function()
-				return "%2l:%-2v"
-			end
 		end,
 	},
+	{
+		"nvim-lualine/lualine.nvim",
+		dependencies = { "nvim-tree/nvim-web-devicons" },
+		config = function()
+			require("lualine").setup({
+				options = { theme = one_dark_theme, section_separators = "", component_separators = "" },
+			})
+		end,
+	},
+
 	{
 		"nvim-neo-tree/neo-tree.nvim",
 		version = "*",
@@ -478,10 +503,14 @@ require("lazy").setup({
 			},
 		},
 	},
-	{ 
+	{
 		"lukas-reineke/indent-blankline.nvim",
 		main = "ibl",
-		opts = {},
+		opts = {
+			indent = {
+				char = "│",
+			},
+		},
 	},
 	{
 		"nvim-treesitter/nvim-treesitter",
@@ -507,13 +536,6 @@ require("lazy").setup({
 			},
 			indent = { enable = true, disable = { "ruby" } },
 		},
-	},
-	{
-  		"nvim-treesitter/nvim-treesitter-context",
-  		dependencies = {"nvim-treesitter/nvim-treesitter"},
-  		config = function()
-    			require("treesitter-context").setup()
- 		 end
 	},
 }, {
 	ui = {
