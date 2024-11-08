@@ -1,4 +1,3 @@
-vim.uv.os_setenv('JAVA_HOME', '/usr/lib/jvm/java-17-openjdk-17.0.13.0.11-3.el9.x86_64')
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
@@ -241,6 +240,7 @@ require('lazy').setup({
     },
   },
   { 'Bilal2453/luvit-meta', lazy = true },
+  'nvim-java/nvim-java',
   {
     'neovim/nvim-lspconfig',
     dependencies = {
@@ -303,6 +303,7 @@ require('lazy').setup({
         pyright = {},
         rust_analyzer = {},
         ts_ls = {},
+        jdtls = {},
         lua_ls = {
           settings = {
             Lua = {
@@ -313,13 +314,13 @@ require('lazy').setup({
           },
         },
       }
+      require('java').setup()
       require('mason').setup()
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
         'stylua',
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
-
       require('mason-lspconfig').setup {
         handlers = {
           function(server_name)
@@ -333,7 +334,7 @@ require('lazy').setup({
   },
   {
     'tpope/vim-fugitive',
-    event = 'VeryLazy', -- Optional: load vim-fugitive lazily
+    event = 'VeryLazy',
   },
   {
     'stevearc/conform.nvim',
@@ -449,6 +450,10 @@ require('lazy').setup({
     opts = {
       suppressed_dirs = { '~/', '~/Projects', '~/Downloads', '/' },
       -- log_level = 'debug',
+      auto_create = function()
+        local cmd = 'git rev-parse --is-inside-work-tree'
+        return vim.fn.system(cmd) == 'true\n'
+      end,
     },
   },
   {
@@ -479,7 +484,6 @@ require('lazy').setup({
       }
     end,
   },
-
   {
     'nvim-neo-tree/neo-tree.nvim',
     version = '*',
@@ -493,7 +497,13 @@ require('lazy').setup({
       { '\\', ':Neotree reveal<CR>', desc = 'NeoTree reveal', silent = true },
     },
     opts = {
+      hide_root_node = true,
       filesystem = {
+        filtered_items = {
+          visible = true,
+          hide_dotfiles = false,
+          hide_gitignored = false,
+        },
         window = {
           mappings = {
             ['\\'] = 'close_window',
@@ -555,6 +565,10 @@ require('lazy').setup({
     },
   },
 })
+vim.cmd [[
+  highlight NeoTreeDirectoryIcon guifg=#61afef
+  highlight NeoTreeRootName guifg=#61afef gui=bold
+]]
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
