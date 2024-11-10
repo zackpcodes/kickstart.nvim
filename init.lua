@@ -35,7 +35,8 @@ vim.opt.scrolloff = 10
 
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
-
+vim.keymap.set('i', 'kj', '<Esc>')
+vim.keymap.set('t', 'kj', '<C-\\><C-n>')
 vim.keymap.set('t', '<Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 vim.keymap.set('n', '<leader>ht', '<cmd>horizontal term<CR>', { desc = 'Open horizontal terminal' })
 vim.keymap.set('n', '<leader>vt', '<cmd>vert term<CR>', { desc = 'Open vertical terminal' })
