@@ -1,11 +1,9 @@
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
-
 vim.g.have_nerd_font = true
-
 vim.opt.number = true
 vim.opt.relativenumber = true
--- vim.o.statuscolumn = "%s %r "
+-- vim.o.statuscolumn = '%s %l %r '
 
 vim.opt.mouse = 'a'
 vim.opt.showmode = false
@@ -36,12 +34,12 @@ vim.opt.cursorline = true
 vim.opt.scrolloff = 10
 
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
-
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 
 vim.keymap.set('t', '<Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 vim.keymap.set('n', '<leader>ht', '<cmd>horizontal term<CR>', { desc = 'Open horizontal terminal' })
 vim.keymap.set('n', '<leader>vt', '<cmd>vert term<CR>', { desc = 'Open vertical terminal' })
+vim.keymap.set('n', '<leader>hs', '<cmd>split<CR>', { desc = 'Open horizontal split' })
 
 vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
 vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
@@ -110,10 +108,27 @@ local one_dark_theme = {
 }
 
 require('lazy').setup({
+  {
+    'stevearc/oil.nvim',
+    config = function(_, opts)
+      require('oil').setup(opts)
+    end,
+    keys = {
+      {
+        '<leader>o',
+        function()
+          require('oil').open()
+        end,
+        desc = '[o]pen Oil',
+      },
+    },
+  },
+  'tpope/vim-fugitive',
   'tpope/vim-sleuth',
   {
     'lewis6991/gitsigns.nvim',
     opts = {
+      current_line_blame = true,
       signs = {
         add = { text = '+' },
         change = { text = '~' },
@@ -186,6 +201,10 @@ require('lazy').setup({
       },
       { 'nvim-telescope/telescope-ui-select.nvim' },
       { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
+      {
+        "nvim-telescope/telescope-live-grep-args.nvim",
+        version = "^1.0.0",
+    },
     },
     config = function()
       require('telescope').setup {
@@ -198,6 +217,7 @@ require('lazy').setup({
 
       pcall(require('telescope').load_extension, 'fzf')
       pcall(require('telescope').load_extension, 'ui-select')
+      pcall(require('telescope').load_extension, 'live_grep_args')
 
       local builtin = require 'telescope.builtin'
       vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
@@ -205,7 +225,7 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
       vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
       vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
-      vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
+      vim.keymap.set("n", "<leader>sg", ":lua require('telescope').extensions.live_grep_args.live_grep_args()<CR>", { desc = '[S]earch by [G]rep' })
       vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
       vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
       vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
@@ -333,10 +353,6 @@ require('lazy').setup({
     end,
   },
   {
-    'tpope/vim-fugitive',
-    event = 'VeryLazy',
-  },
-  {
     'stevearc/conform.nvim',
     event = { 'BufWritePre' },
     cmd = { 'ConformInfo' },
@@ -367,6 +383,7 @@ require('lazy').setup({
       -- end,
       formatters_by_ft = {
         lua = { 'stylua' },
+        java = { 'google-java-format' },
         javascript = { 'prettierd', 'prettier', stop_after_first = true },
       },
     },
@@ -448,8 +465,6 @@ require('lazy').setup({
     ---@module "auto-session"
     ---@type AutoSession.Config
     opts = {
-      suppressed_dirs = { '~/', '~/Projects', '~/Downloads', '/' },
-      -- log_level = 'debug',
       auto_create = function()
         local cmd = 'git rev-parse --is-inside-work-tree'
         return vim.fn.system(cmd) == 'true\n'
@@ -462,7 +477,12 @@ require('lazy').setup({
     dependencies = { 'nvim-lua/plenary.nvim' },
     opts = { signs = false },
   },
-  { -- Collection of various small independent plugins/modules
+  {
+    'windwp/nvim-autopairs',
+    event = 'InsertEnter',
+    config = true,
+  },
+  {
     'echasnovski/mini.nvim',
     config = function()
       require('mini.ai').setup { n_lines = 500 }
@@ -484,34 +504,34 @@ require('lazy').setup({
       }
     end,
   },
-  {
-    'nvim-neo-tree/neo-tree.nvim',
-    version = '*',
-    dependencies = {
-      'nvim-lua/plenary.nvim',
-      'nvim-tree/nvim-web-devicons',
-      'MunifTanjim/nui.nvim',
-    },
-    cmd = 'Neotree',
-    keys = {
-      { '\\', ':Neotree reveal<CR>', desc = 'NeoTree reveal', silent = true },
-    },
-    opts = {
-      hide_root_node = true,
-      filesystem = {
-        filtered_items = {
-          visible = true,
-          hide_dotfiles = false,
-          hide_gitignored = false,
-        },
-        window = {
-          mappings = {
-            ['\\'] = 'close_window',
-          },
-        },
-      },
-    },
-  },
+  -- {
+  --   'nvim-neo-tree/neo-tree.nvim',
+  --   version = '*',
+  --   dependencies = {
+  --     'nvim-lua/plenary.nvim',
+  --     'nvim-tree/nvim-web-devicons',
+  --     'MunifTanjim/nui.nvim',
+  --   },
+  --   cmd = 'Neotree',
+  --   keys = {
+  --     { '\\', ':Neotree reveal<CR>', desc = 'NeoTree reveal', silent = true },
+  --   },
+  --   opts = {
+  --     hide_root_node = true,
+  --     filesystem = {
+  --       filtered_items = {
+  --         visible = true,
+  --         hide_dotfiles = false,
+  --         hide_gitignored = false,
+  --       },
+  --       window = {
+  --         mappings = {
+  --           ['\\'] = 'close_window',
+  --         },
+  --       },
+  --     },
+  --   },
+  -- },
   {
     'lukas-reineke/indent-blankline.nvim',
     main = 'ibl',
