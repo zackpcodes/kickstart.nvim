@@ -31,12 +31,14 @@ vim.opt.inccommand = 'split'
 
 vim.opt.cursorline = true
 
-vim.opt.scrolloff = 10
+-- vim.opt.scrolloff = 10
 
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 vim.keymap.set('i', 'kj', '<Esc>')
 vim.keymap.set('t', 'kj', '<C-\\><C-n>')
+vim.keymap.set('i', 'jk', '<Esc>')
+vim.keymap.set('t', 'jk', '<C-\\><C-n>')
 vim.keymap.set('t', '<Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 vim.keymap.set('n', '<leader>ht', '<cmd>horizontal term<CR>', { desc = 'Open horizontal terminal' })
 vim.keymap.set('n', '<leader>vt', '<cmd>vert term<CR>', { desc = 'Open vertical terminal' })
@@ -114,6 +116,11 @@ require('lazy').setup({
     config = function(_, opts)
       require('oil').setup(opts)
     end,
+    opts = {
+      win_options = {
+        signcolumn = 'yes:2',
+      },
+    },
     keys = {
       {
         '<leader>o',
@@ -123,6 +130,13 @@ require('lazy').setup({
         desc = '[o]pen Oil',
       },
     },
+  },
+  {
+    'refractalize/oil-git-status.nvim',
+    dependencies = {
+      'stevearc/oil.nvim',
+    },
+    config = true,
   },
   'tpope/vim-fugitive',
   'tpope/vim-sleuth',
@@ -203,12 +217,26 @@ require('lazy').setup({
       { 'nvim-telescope/telescope-ui-select.nvim' },
       { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
       {
-        "nvim-telescope/telescope-live-grep-args.nvim",
-        version = "^1.0.0",
-    },
+        'nvim-telescope/telescope-live-grep-args.nvim',
+        version = '^1.0.0',
+      },
     },
     config = function()
       require('telescope').setup {
+        defaults = {
+          sorting_strategy = 'ascending',
+          prompt_prefix = '   ',
+          selection_caret = ' ',
+          entry_prefix = ' ',
+          layout_config = {
+            horizontal = {
+              prompt_position = 'top',
+              preview_width = 0.55,
+            },
+            width = 0.87,
+            height = 0.80,
+          },
+        },
         extensions = {
           ['ui-select'] = {
             require('telescope.themes').get_dropdown(),
@@ -226,7 +254,7 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
       vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
       vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
-      vim.keymap.set("n", "<leader>sg", ":lua require('telescope').extensions.live_grep_args.live_grep_args()<CR>", { desc = '[S]earch by [G]rep' })
+      vim.keymap.set('n', '<leader>sg', ":lua require('telescope').extensions.live_grep_args.live_grep_args()<CR>", { desc = '[S]earch by [G]rep' })
       vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
       vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
       vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
@@ -505,34 +533,34 @@ require('lazy').setup({
       }
     end,
   },
-  -- {
-  --   'nvim-neo-tree/neo-tree.nvim',
-  --   version = '*',
-  --   dependencies = {
-  --     'nvim-lua/plenary.nvim',
-  --     'nvim-tree/nvim-web-devicons',
-  --     'MunifTanjim/nui.nvim',
-  --   },
-  --   cmd = 'Neotree',
-  --   keys = {
-  --     { '\\', ':Neotree reveal<CR>', desc = 'NeoTree reveal', silent = true },
-  --   },
-  --   opts = {
-  --     hide_root_node = true,
-  --     filesystem = {
-  --       filtered_items = {
-  --         visible = true,
-  --         hide_dotfiles = false,
-  --         hide_gitignored = false,
-  --       },
-  --       window = {
-  --         mappings = {
-  --           ['\\'] = 'close_window',
-  --         },
-  --       },
-  --     },
-  --   },
-  -- },
+  {
+    'nvim-neo-tree/neo-tree.nvim',
+    version = '*',
+    dependencies = {
+      'nvim-lua/plenary.nvim',
+      'nvim-tree/nvim-web-devicons',
+      'MunifTanjim/nui.nvim',
+    },
+    cmd = 'Neotree',
+    keys = {
+      { '\\', ':Neotree reveal<CR>', desc = 'NeoTree reveal', silent = true },
+    },
+    opts = {
+      hide_root_node = true,
+      filesystem = {
+        filtered_items = {
+          visible = true,
+          hide_dotfiles = false,
+          hide_gitignored = false,
+        },
+        window = {
+          mappings = {
+            ['\\'] = 'close_window',
+          },
+        },
+      },
+    },
+  },
   {
     'lukas-reineke/indent-blankline.nvim',
     main = 'ibl',
