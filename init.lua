@@ -125,7 +125,7 @@ require('lazy').setup({
       {
         '<leader>o',
         function()
-          require('oil').open()
+          require('oil').open_float()
         end,
         desc = '[o]pen Oil',
       },
