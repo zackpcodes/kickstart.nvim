@@ -21,7 +21,7 @@ vim.opt.smartcase = true
 
 vim.opt.signcolumn = 'yes'
 
-vim.opt.updatetime = 250
+vim.opt.updatetime = 750
 vim.opt.timeoutlen = 400
 
 vim.opt.splitright = true
@@ -127,7 +127,7 @@ require('lazy').setup({
         function()
           require('oil').open_float()
         end,
-        desc = '[o]pen Oil',
+        desc = 'Open [o]il',
       },
     },
   },
@@ -353,6 +353,7 @@ require('lazy').setup({
         rust_analyzer = {},
         ts_ls = {},
         jdtls = {},
+        eslint = {},
         lua_ls = {
           settings = {
             Lua = {
@@ -534,34 +535,6 @@ require('lazy').setup({
     end,
   },
   {
-    'nvim-neo-tree/neo-tree.nvim',
-    version = '*',
-    dependencies = {
-      'nvim-lua/plenary.nvim',
-      'nvim-tree/nvim-web-devicons',
-      'MunifTanjim/nui.nvim',
-    },
-    cmd = 'Neotree',
-    keys = {
-      { '\\', ':Neotree reveal<CR>', desc = 'NeoTree reveal', silent = true },
-    },
-    opts = {
-      hide_root_node = true,
-      filesystem = {
-        filtered_items = {
-          visible = true,
-          hide_dotfiles = false,
-          hide_gitignored = false,
-        },
-        window = {
-          mappings = {
-            ['\\'] = 'close_window',
-          },
-        },
-      },
-    },
-  },
-  {
     'lukas-reineke/indent-blankline.nvim',
     main = 'ibl',
     opts = {
@@ -614,10 +587,15 @@ require('lazy').setup({
     },
   },
 })
-vim.cmd [[
-  highlight NeoTreeDirectoryIcon guifg=#61afef
-  highlight NeoTreeRootName guifg=#61afef gui=bold
-]]
+vim.diagnostic.config {
+  virtual_text = false,
+}
+vim.api.nvim_create_autocmd('CursorHold', {
+  callback = function()
+    vim.diagnostic.open_float(nil, { focusable = false, scope = 'line' })
+  end,
+})
+vim.api.nvim_set_hl(0, 'TelescopePromptPrefix', { fg = '#e06c75' })
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
