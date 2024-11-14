@@ -352,6 +352,7 @@ require('lazy').setup({
         pyright = {},
         rust_analyzer = {},
         ts_ls = {},
+        gopls = {},
         jdtls = {},
         eslint = {},
         lua_ls = {
