@@ -31,7 +31,7 @@ vim.opt.inccommand = 'split'
 
 vim.opt.cursorline = true
 
--- vim.opt.scrolloff = 10
+vim.opt.scrolloff = 10
 
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
@@ -111,33 +111,33 @@ local one_dark_theme = {
 }
 
 require('lazy').setup({
-  {
-    'stevearc/oil.nvim',
-    config = function(_, opts)
-      require('oil').setup(opts)
-    end,
-    opts = {
-      win_options = {
-        signcolumn = 'yes:2',
-      },
-    },
-    keys = {
-      {
-        '<leader>o',
-        function()
-          require('oil').open_float()
-        end,
-        desc = 'Open [o]il',
-      },
-    },
-  },
-  {
-    'refractalize/oil-git-status.nvim',
-    dependencies = {
-      'stevearc/oil.nvim',
-    },
-    config = true,
-  },
+  -- {
+  --   'stevearc/oil.nvim',
+  --   config = function(_, opts)
+  --     require('oil').setup(opts)
+  --   end,
+  --   opts = {
+  --     win_options = {
+  --       signcolumn = 'yes:2',
+  --     },
+  --   },
+  --   keys = {
+  --     {
+  --       '<leader>o',
+  --       function()
+  --         require('oil').open_float()
+  --       end,
+  --       desc = 'Open [o]il',
+  --     },
+  --   },
+  -- },
+  -- {
+  --   'refractalize/oil-git-status.nvim',
+  --   dependencies = {
+  --     'stevearc/oil.nvim',
+  --   },
+  --   config = true,
+  -- },
   'tpope/vim-fugitive',
   'tpope/vim-sleuth',
   {
@@ -518,6 +518,7 @@ require('lazy').setup({
     'echasnovski/mini.nvim',
     config = function()
       require('mini.ai').setup { n_lines = 500 }
+      require('mini.files').setup()
       require('mini.comment').setup {
         mappings = {
           comment_visual = '<Leader>/',
