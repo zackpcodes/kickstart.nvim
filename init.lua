@@ -54,6 +54,27 @@ vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right win
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
+local filewatches = {}
+
+function watch(filepath)
+  local w = vim.uv.new_fs_event()
+  w:start(
+    filepath,
+    {},
+    vim.schedule_wrap(function()
+      vim.api.nvim_command 'checktime'
+      w:stop()
+      watch(filepath)
+    end)
+  )
+end
+
+vim.api.nvim_create_autocmd('BufRead', {
+  callback = function(args)
+    watch(vim.api.nvim_buf_get_name(args.buf))
+  end 
+})
+
 vim.api.nvim_create_autocmd('TextYankPost', {
   desc = 'Highlight when yanking (copying) text',
   group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
@@ -119,6 +140,10 @@ require('lazy').setup({
     opts = {
       win_options = {
         signcolumn = 'yes:2',
+      },
+      float = {
+        max_width = 100,
+        max_height = 100,
       },
     },
     keys = {
