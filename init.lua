@@ -20,10 +20,10 @@ vim.opt.ignorecase = true
 vim.opt.smartcase = true
 vim.opt.signcolumn = 'yes'
 
--- vim.api.nvim_create_autocmd({ "TermLeave" }, {
---   command = "if mode() != 'c' | checktime | endif",
---   pattern = {"*"},
--- })
+vim.api.nvim_create_autocmd({ "TermLeave" }, {
+  command = "if mode() != 'c' | checktime | endif",
+  pattern = {"*"},
+})
 
 vim.opt.updatetime = 750
 vim.opt.timeoutlen = 400
