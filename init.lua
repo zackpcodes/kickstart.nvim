@@ -18,7 +18,7 @@ vim.opt.undofile = true
 
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
-
+vim.o.autoread = true
 vim.opt.signcolumn = 'yes'
 
 vim.opt.updatetime = 750
@@ -39,6 +39,8 @@ vim.keymap.set('i', 'kj', '<Esc>')
 vim.keymap.set('t', 'kj', '<C-\\><C-n>')
 vim.keymap.set('i', 'jk', '<Esc>')
 vim.keymap.set('t', 'jk', '<C-\\><C-n>')
+vim.keymap.set('v', '>', '>gv')
+vim.keymap.set('v', '<', '<gv')
 vim.keymap.set('t', '<Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 vim.keymap.set('n', '<leader>ht', '<cmd>horizontal term<CR>', { desc = 'Open horizontal terminal' })
 vim.keymap.set('n', '<leader>vt', '<cmd>vert term<CR>', { desc = 'Open vertical terminal' })
@@ -53,27 +55,6 @@ vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left wind
 vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
-
-local filewatches = {}
-
-function watch(filepath)
-  local w = vim.uv.new_fs_event()
-  w:start(
-    filepath,
-    {},
-    vim.schedule_wrap(function()
-      vim.api.nvim_command 'checktime'
-      w:stop()
-      watch(filepath)
-    end)
-  )
-end
-
-vim.api.nvim_create_autocmd('BufRead', {
-  callback = function(args)
-    watch(vim.api.nvim_buf_get_name(args.buf))
-  end 
-})
 
 vim.api.nvim_create_autocmd('TextYankPost', {
   desc = 'Highlight when yanking (copying) text',
@@ -258,8 +239,8 @@ require('lazy').setup({
               prompt_position = 'top',
               preview_width = 0.55,
             },
-            width = 0.87,
-            height = 0.80,
+            width = 0.80,
+            height = 0.70,
           },
         },
         extensions = {
@@ -283,7 +264,7 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
       vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
       vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
-      vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
+      vim.keymap.set('n', '<leader><leader>', ":lua require('telescope.builtin').buffers({ sort_mru = true })<CR>", { desc = '[ ] Find existing buffers' })
 
       vim.keymap.set('n', '<leader>/', function()
         builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
@@ -515,19 +496,19 @@ require('lazy').setup({
       vim.cmd.hi 'Comment gui=none'
     end,
   },
-  {
-    'rmagatti/auto-session',
-    lazy = false,
-    ---enables autocomplete for opts
-    ---@module "auto-session"
-    ---@type AutoSession.Config
-    opts = {
-      auto_create = function()
-        local cmd = 'git rev-parse --is-inside-work-tree'
-        return vim.fn.system(cmd) == 'true\n'
-      end,
-    },
-  },
+  -- {
+  --   'rmagatti/auto-session',
+  --   lazy = false,
+  --   ---enables autocomplete for opts
+  --   ---@module "auto-session"
+  --   ---@type AutoSession.Config
+  --   opts = {
+  --     auto_create = function()
+  --       local cmd = 'git rev-parse --is-inside-work-tree'
+  --       return vim.fn.system(cmd) == 'true\n'
+  --     end,
+  --   },
+  -- },
   {
     'folke/todo-comments.nvim',
     event = 'VimEnter',
