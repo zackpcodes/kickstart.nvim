@@ -3,11 +3,10 @@ vim.g.maplocalleader = ' '
 vim.g.have_nerd_font = true
 vim.opt.number = true
 vim.opt.relativenumber = true
--- vim.o.statuscolumn = '%s %l %r '
+vim.o.statuscolumn = '%s %l %r '
 
 vim.opt.mouse = 'a'
 vim.opt.showmode = false
-
 vim.schedule(function()
   vim.opt.clipboard = 'unnamedplus'
 end)
@@ -155,6 +154,13 @@ require('lazy').setup({
     opts = {
       current_line_blame = true,
       signs = {
+        add = { text = '+' },
+        change = { text = '~' },
+        delete = { text = '_' },
+        topdelete = { text = '‾' },
+        changedelete = { text = '~' },
+      },
+      signs_staged = {
         add = { text = '+' },
         change = { text = '~' },
         delete = { text = '_' },
