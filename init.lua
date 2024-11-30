@@ -387,6 +387,9 @@ require('lazy').setup({
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
         'stylua',
+        'fixjson',
+        'google-java-format',
+        'prettier'
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
       require('mason-lspconfig').setup {
@@ -433,6 +436,7 @@ require('lazy').setup({
         lua = { 'stylua' },
         java = { 'google-java-format' },
         javascript = { 'prettierd', 'prettier', stop_after_first = true },
+        json = { 'fixjson' },
       },
     },
   },
