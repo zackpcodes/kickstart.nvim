@@ -4,7 +4,7 @@ vim.g.have_nerd_font = true
 vim.opt.number = true
 vim.opt.relativenumber = true
 vim.o.statuscolumn = '%s %l %r '
-
+vim.opt.colorcolumn = '150'
 vim.opt.mouse = 'a'
 vim.opt.showmode = false
 vim.schedule(function()
@@ -19,9 +19,9 @@ vim.opt.ignorecase = true
 vim.opt.smartcase = true
 vim.opt.signcolumn = 'yes'
 
-vim.api.nvim_create_autocmd({ "TermLeave" }, {
+vim.api.nvim_create_autocmd({ 'TermLeave' }, {
   command = "if mode() != 'c' | checktime | endif",
-  pattern = {"*"},
+  pattern = { '*' },
 })
 
 vim.opt.updatetime = 750
@@ -33,7 +33,6 @@ vim.opt.splitbelow = true
 vim.opt.inccommand = 'split'
 
 vim.opt.cursorline = true
-
 vim.opt.scrolloff = 10
 
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
@@ -389,7 +388,7 @@ require('lazy').setup({
         'stylua',
         'fixjson',
         'google-java-format',
-        'prettier'
+        'prettier',
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
       require('mason-lspconfig').setup {
@@ -399,6 +398,16 @@ require('lazy').setup({
             server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
             require('lspconfig')[server_name].setup(server)
           end,
+        },
+      }
+      local dap = require 'dap'
+      dap.configurations.java = {
+        {
+          type = 'java',
+          request = 'attach',
+          name = 'Attach 8000',
+          hostname = '127.0.0.1',
+          port = '8000',
         },
       }
     end,
@@ -552,7 +561,28 @@ require('lazy').setup({
     dependencies = { 'nvim-tree/nvim-web-devicons' },
     config = function()
       require('lualine').setup {
-        options = { theme = one_dark_theme, section_separators = '', component_separators = '' },
+        options = {
+          sections = {
+            lualine_x = {
+              {
+                function()
+                  return require('dap').status()
+                end,
+                icon = { '', color = { fg = '#e7c664' } },
+                cond = function()
+                  if not package.loaded.dap then
+                    return false
+                  end
+                  local session = require('dap').session()
+                  return session ~= nil
+                end,
+              },
+            },
+          },
+          theme = one_dark_theme,
+          section_separators = '',
+          component_separators = '',
+        },
       }
     end,
   },
