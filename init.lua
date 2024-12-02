@@ -116,6 +116,15 @@ local one_dark_theme = {
 
 require('lazy').setup({
   {
+    'MeanderingProgrammer/render-markdown.nvim',
+    dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.nvim' }, -- if you use the mini.nvim suite
+    -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.icons' }, -- if you use standalone mini plugins
+    -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
+    ---@module 'render-markdown'
+    ---@type render.md.UserConfig
+    opts = {},
+  },
+  {
     'stevearc/oil.nvim',
     config = function(_, opts)
       require('oil').setup(opts)
@@ -410,6 +419,35 @@ require('lazy').setup({
           port = '8000',
         },
       }
+      if not dap.adapters['pwa-chrome'] then
+        dap.adapters['pwa-chrome'] = {
+          type = 'server',
+          host = 'localhost',
+          port = '${port}',
+          executable = {
+            command = 'node',
+            args = {
+              require('mason-registry').get_package('js-debug-adapter'):get_install_path() .. '/js-debug/src/dapDebugServer.js',
+              '${port}',
+            },
+          },
+        }
+      end
+      for _, lang in ipairs {
+        'typescript',
+        'javascript',
+        'typescriptreact',
+        'javascriptreact',
+      } do
+        dap.configurations[lang] = dap.configurations[lang] or {}
+        table.insert(dap.configurations[lang], {
+          type = 'pwa-chrome',
+          request = 'launch',
+          name = 'Launch Chrome',
+          url = 'https://www.local.gfclab.com:4200',
+          sourceMaps = true,
+        })
+      end
     end,
   },
   {
