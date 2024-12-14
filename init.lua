@@ -3,7 +3,7 @@ vim.g.maplocalleader = ' '
 vim.g.have_nerd_font = true
 vim.opt.number = true
 vim.opt.relativenumber = true
-vim.o.statuscolumn = '%s %l %r '
+-- vim.o.statuscolumn = '%s %l %r '
 vim.opt.colorcolumn = '150'
 vim.opt.mouse = 'a'
 vim.opt.showmode = false
@@ -43,15 +43,18 @@ vim.keymap.set('i', 'jk', '<Esc>')
 vim.keymap.set('t', 'jk', '<C-\\><C-n>')
 vim.keymap.set('v', '>', '>gv')
 vim.keymap.set('v', '<', '<gv')
+vim.keymap.set('v', 'p', '"_dP')
 vim.keymap.set('t', '<Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
-vim.keymap.set('n', '<leader>ht', '<cmd>horizontal term<CR>', { desc = 'Open horizontal terminal' })
-vim.keymap.set('n', '<leader>vt', '<cmd>vert term<CR>', { desc = 'Open vertical terminal' })
 vim.keymap.set('n', '<leader>hs', '<cmd>split<CR>', { desc = 'Open horizontal split' })
+vim.keymap.set('n', '<leader>vs', '<cmd>vsplit<CR>', { desc = 'Open vertical split' })
 
 vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
 vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
 vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
 vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
+
+vim.keymap.set('n', '<C-d>', '<C-d>zz')
+vim.keymap.set('n', '<C-u>', '<C-u>zz')
 
 vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
 vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
@@ -133,16 +136,12 @@ require('lazy').setup({
       win_options = {
         signcolumn = 'yes:2',
       },
-      float = {
-        max_width = 100,
-        max_height = 100,
-      },
     },
     keys = {
       {
         '<leader>o',
         function()
-          require('oil').open_float()
+          require('oil').open()
         end,
         desc = 'Open [o]il',
       },
@@ -240,10 +239,6 @@ require('lazy').setup({
       },
       { 'nvim-telescope/telescope-ui-select.nvim' },
       { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
-      {
-        'nvim-telescope/telescope-live-grep-args.nvim',
-        version = '^1.0.0',
-      },
     },
     config = function()
       require('telescope').setup {
@@ -257,7 +252,7 @@ require('lazy').setup({
               prompt_position = 'top',
               preview_width = 0.55,
             },
-            width = 0.80,
+            width = 0.90,
             height = 0.70,
           },
         },
@@ -278,18 +273,11 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
       vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
       vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
-      vim.keymap.set('n', '<leader>sg', ":lua require('telescope').extensions.live_grep_args.live_grep_args()<CR>", { desc = '[S]earch by [G]rep' })
+      vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
       vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
       vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
       vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
       vim.keymap.set('n', '<leader><leader>', ":lua require('telescope.builtin').buffers({ sort_mru = true })<CR>", { desc = '[ ] Find existing buffers' })
-
-      vim.keymap.set('n', '<leader>/', function()
-        builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
-          winblend = 10,
-          previewer = false,
-        })
-      end, { desc = '[/] Fuzzily search in current buffer' })
 
       vim.keymap.set('n', '<leader>s/', function()
         builtin.live_grep {
@@ -370,6 +358,14 @@ require('lazy').setup({
           end
         end,
       })
+      if vim.g.have_nerd_font then
+        local signs = { ERROR = '', WARN = '', INFO = '', HINT = '' }
+        local diagnostic_signs = {}
+        for type, icon in pairs(signs) do
+          diagnostic_signs[vim.diagnostic.severity[type]] = icon
+        end
+        vim.diagnostic.config { signs = { text = diagnostic_signs } }
+      end
       local capabilities = vim.lsp.protocol.make_client_capabilities()
       capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
       local servers = {
@@ -466,19 +462,6 @@ require('lazy').setup({
     },
     opts = {
       notify_on_error = false,
-      -- format_on_save = function(bufnr)
-      -- 	local disable_filetypes = { c = true, cpp = true }
-      -- 	local lsp_format_opt
-      -- 	if disable_filetypes[vim.bo[bufnr].filetype] then
-      -- 		lsp_format_opt = "never"
-      -- 	else
-      -- 		lsp_format_opt = "fallback"
-      -- 	end
-      -- 	return {
-      -- 		timeout_ms = 500,
-      -- 		lsp_format = lsp_format_opt,
-      -- 	}
-      -- end,
       formatters_by_ft = {
         lua = { 'stylua' },
         java = { 'google-java-format' },
@@ -600,26 +583,35 @@ require('lazy').setup({
     config = function()
       require('lualine').setup {
         options = {
-          sections = {
-            lualine_x = {
-              {
-                function()
-                  return require('dap').status()
-                end,
-                icon = { '', color = { fg = '#e7c664' } },
-                cond = function()
-                  if not package.loaded.dap then
-                    return false
-                  end
-                  local session = require('dap').session()
-                  return session ~= nil
-                end,
-              },
-            },
-          },
           theme = one_dark_theme,
           section_separators = '',
           component_separators = '',
+        },
+        sections = {
+          lualine_c = {
+            {
+              'filename',
+              path = 1,
+            },
+          },
+          lualine_x = {
+            {
+              function()
+                return ''
+              end,
+              color = { fg = '#e06c75' },
+              cond = function()
+                if not package.loaded.dap then
+                  return false
+                end
+                local session = require('dap').session()
+                return session ~= nil
+              end,
+            },
+            'encoding',
+            'fileformat',
+            'filetype',
+          },
         },
       }
     end,
