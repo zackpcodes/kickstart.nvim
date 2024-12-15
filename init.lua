@@ -18,10 +18,17 @@ vim.opt.undofile = true
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
 vim.opt.signcolumn = 'yes'
-
 vim.api.nvim_create_autocmd({ 'TermLeave' }, {
   command = "if mode() != 'c' | checktime | endif",
   pattern = { '*' },
+})
+
+vim.api.nvim_create_autocmd({ "VimResized" }, {
+  callback = function()
+    local current_tab = vim.fn.tabpagenr()
+    vim.cmd("tabdo wincmd =")
+    vim.cmd("tabnext " .. current_tab)
+  end,
 })
 
 vim.opt.updatetime = 750
