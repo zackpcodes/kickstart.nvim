@@ -3,7 +3,7 @@ vim.g.maplocalleader = ' '
 vim.g.have_nerd_font = true
 vim.opt.number = true
 vim.opt.relativenumber = true
--- vim.o.statuscolumn = '%s %l %r '
+vim.o.statuscolumn = ' %s %r '
 vim.opt.colorcolumn = '150'
 vim.opt.mouse = 'a'
 vim.opt.showmode = false
@@ -41,7 +41,9 @@ vim.opt.inccommand = 'split'
 
 vim.opt.cursorline = true
 vim.opt.scrolloff = 10
-
+-- next two are to add blank lines above without going into insert mode
+vim.keymap.set('n', '<CR>', 'm`o<Esc>``')
+vim.keymap.set('n', '<S-CR>', 'm`O<Esc>``')
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 vim.keymap.set('i', 'kj', '<Esc>')
@@ -59,6 +61,11 @@ vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
 vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
 vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
 vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
+
+vim.keymap.set({ "n", "x" }, "j", "v:count == 0 ? 'gj' : 'j'", { desc = "Down", expr = true, silent = true })
+vim.keymap.set({ "n", "x" }, "<Down>", "v:count == 0 ? 'gj' : 'j'", { desc = "Down", expr = true, silent = true })
+vim.keymap.set({ "n", "x" }, "k", "v:count == 0 ? 'gk' : 'k'", { desc = "Up", expr = true, silent = true })
+vim.keymap.set({ "n", "x" }, "<Up>", "v:count == 0 ? 'gk' : 'k'", { desc = "Up", expr = true, silent = true })
 
 vim.keymap.set('n', '<C-d>', '<C-d>zz')
 vim.keymap.set('n', '<C-u>', '<C-u>zz')
@@ -250,15 +257,7 @@ require('lazy').setup({
     config = function()
       require('telescope').setup {
         defaults = {
-          sorting_strategy = 'ascending',
-          prompt_prefix = '   ',
-          selection_caret = ' ',
-          entry_prefix = ' ',
           layout_config = {
-            horizontal = {
-              prompt_position = 'top',
-              preview_width = 0.55,
-            },
             width = 0.90,
             height = 0.70,
           },
@@ -622,15 +621,6 @@ require('lazy').setup({
         },
       }
     end,
-  },
-  {
-    'lukas-reineke/indent-blankline.nvim',
-    main = 'ibl',
-    opts = {
-      indent = {
-        char = '│',
-      },
-    },
   },
   {
     'nvim-treesitter/nvim-treesitter',
