@@ -238,6 +238,7 @@ require('lazy').setup({
       },
     },
   },
+  'towolf/vim-helm',
   {
     'nvim-telescope/telescope.nvim',
     event = 'VimEnter',
