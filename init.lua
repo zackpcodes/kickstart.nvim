@@ -3,7 +3,7 @@ vim.g.maplocalleader = ' '
 vim.g.have_nerd_font = true
 vim.opt.number = true
 vim.opt.relativenumber = true
-vim.o.statuscolumn = ' %s %r '
+vim.o.statuscolumn = ' %s %{v:relnum==0?v:lnum:v:relnum}'
 vim.opt.colorcolumn = '150'
 vim.opt.mouse = 'a'
 vim.opt.showmode = false
@@ -23,11 +23,11 @@ vim.api.nvim_create_autocmd({ 'TermLeave' }, {
   pattern = { '*' },
 })
 
-vim.api.nvim_create_autocmd({ "VimResized" }, {
+vim.api.nvim_create_autocmd({ 'VimResized' }, {
   callback = function()
     local current_tab = vim.fn.tabpagenr()
-    vim.cmd("tabdo wincmd =")
-    vim.cmd("tabnext " .. current_tab)
+    vim.cmd 'tabdo wincmd ='
+    vim.cmd('tabnext ' .. current_tab)
   end,
 })
 
@@ -62,10 +62,10 @@ vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
 vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
 vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
 
-vim.keymap.set({ "n", "x" }, "j", "v:count == 0 ? 'gj' : 'j'", { desc = "Down", expr = true, silent = true })
-vim.keymap.set({ "n", "x" }, "<Down>", "v:count == 0 ? 'gj' : 'j'", { desc = "Down", expr = true, silent = true })
-vim.keymap.set({ "n", "x" }, "k", "v:count == 0 ? 'gk' : 'k'", { desc = "Up", expr = true, silent = true })
-vim.keymap.set({ "n", "x" }, "<Up>", "v:count == 0 ? 'gk' : 'k'", { desc = "Up", expr = true, silent = true })
+vim.keymap.set({ 'n', 'x' }, 'j', "v:count == 0 ? 'gj' : 'j'", { desc = 'Down', expr = true, silent = true })
+vim.keymap.set({ 'n', 'x' }, '<Down>', "v:count == 0 ? 'gj' : 'j'", { desc = 'Down', expr = true, silent = true })
+vim.keymap.set({ 'n', 'x' }, 'k', "v:count == 0 ? 'gk' : 'k'", { desc = 'Up', expr = true, silent = true })
+vim.keymap.set({ 'n', 'x' }, '<Up>', "v:count == 0 ? 'gk' : 'k'", { desc = 'Up', expr = true, silent = true })
 
 vim.keymap.set('n', '<C-d>', '<C-d>zz')
 vim.keymap.set('n', '<C-u>', '<C-u>zz')
@@ -150,12 +150,18 @@ require('lazy').setup({
       win_options = {
         signcolumn = 'yes:2',
       },
+      view_options = {
+        show_hidden = true,
+        is_always_hidden = function()
+          return name == 'node_modules' or name == '.git'
+        end,
+      },
     },
     keys = {
       {
         '<leader>o',
         function()
-          require('oil').open()
+          vim.cmd((vim.bo.filetype == 'oil') and 'bd' or 'Oil')
         end,
         desc = 'Open [o]il',
       },
@@ -261,6 +267,20 @@ require('lazy').setup({
           layout_config = {
             width = 0.90,
             height = 0.70,
+          },
+          file_ignore_patterns = {
+            'node_modules',
+            '.git',
+          },
+        },
+        pickers = {
+          live_grep = {
+            additional_args = function(_)
+              return { '--hidden' }
+            end,
+          },
+          find_files = {
+            hidden = true,
           },
         },
         extensions = {
