@@ -141,32 +141,32 @@ require('lazy').setup({
     ---@type render.md.UserConfig
     opts = {},
   },
-  {
-    'stevearc/oil.nvim',
-    config = function(_, opts)
-      require('oil').setup(opts)
-    end,
-    opts = {
-      win_options = {
-        signcolumn = 'yes:2',
-      },
-      view_options = {
-        show_hidden = true,
-        is_always_hidden = function()
-          return name == 'node_modules' or name == '.git'
-        end,
-      },
-    },
-    keys = {
-      {
-        '<leader>o',
-        function()
-          vim.cmd((vim.bo.filetype == 'oil') and 'bd' or 'Oil')
-        end,
-        desc = 'Open [o]il',
-      },
-    },
-  },
+  -- {
+  --   'stevearc/oil.nvim',
+  --   config = function(_, opts)
+  --     require('oil').setup(opts)
+  --   end,
+  --   opts = {
+  --     win_options = {
+  --       signcolumn = 'yes:2',
+  --     },
+  --     view_options = {
+  --       show_hidden = true,
+  --       is_always_hidden = function()
+  --         return name == 'node_modules' or name == '.git'
+  --       end,
+  --     },
+  --   },
+  --   keys = {
+  --     {
+  --       '<leader>o',
+  --       function()
+  --         vim.cmd((vim.bo.filetype == 'oil') and 'bd' or 'Oil')
+  --       end,
+  --       desc = 'Open [o]il',
+  --     },
+  --   },
+  -- },
   {
     'refractalize/oil-git-status.nvim',
     dependencies = {
@@ -602,6 +602,7 @@ require('lazy').setup({
         },
       }
       require('mini.surround').setup()
+      require('mini.files').setup()
     end,
   },
   {
