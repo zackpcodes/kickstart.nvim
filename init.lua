@@ -3,7 +3,7 @@ vim.g.maplocalleader = ' '
 vim.g.have_nerd_font = true
 vim.opt.number = true
 vim.opt.relativenumber = true
-vim.o.statuscolumn = ' %s %{v:relnum==0?v:lnum:v:relnum}'
+vim.o.statuscolumn = ' %s %{v:relnum==0?v:lnum:v:relnum} '
 vim.opt.colorcolumn = '150'
 vim.opt.mouse = 'a'
 vim.opt.showmode = false
