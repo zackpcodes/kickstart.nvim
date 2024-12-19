@@ -3,21 +3,31 @@ vim.g.maplocalleader = ' '
 vim.g.have_nerd_font = true
 vim.opt.number = true
 vim.opt.relativenumber = true
-vim.o.statuscolumn = ' %s%3{v:relnum==0?v:lnum:v:relnum} │ '
+vim.o.statuscolumn = ' %s%4{v:relnum==0?v:lnum:v:relnum} '
 vim.opt.colorcolumn = '150'
 vim.opt.mouse = 'a'
 vim.opt.showmode = false
+vim.opt.breakindent = true
+vim.opt.undofile = true
+vim.opt.ignorecase = true
+vim.opt.smartcase = true
+vim.opt.signcolumn = 'yes'
+vim.opt.updatetime = 750
+vim.opt.timeoutlen = 400
+vim.opt.splitright = true
+vim.opt.splitbelow = true
+vim.opt.inccommand = 'split'
+vim.opt.cursorline = true
+vim.opt.scrolloff = 10
+
+vim.diagnostic.config {
+  virtual_text = false,
+}
+
 vim.schedule(function()
   vim.opt.clipboard = 'unnamedplus'
 end)
 
-vim.opt.breakindent = true
-
-vim.opt.undofile = true
-
-vim.opt.ignorecase = true
-vim.opt.smartcase = true
-vim.opt.signcolumn = 'yes'
 vim.api.nvim_create_autocmd({ 'TermLeave' }, {
   command = "if mode() != 'c' | checktime | endif",
   pattern = { '*' },
@@ -31,16 +41,14 @@ vim.api.nvim_create_autocmd({ 'VimResized' }, {
   end,
 })
 
-vim.opt.updatetime = 750
-vim.opt.timeoutlen = 400
+vim.api.nvim_create_autocmd('CursorHold', {
+  callback = function()
+    vim.diagnostic.open_float(nil, { focusable = false, scope = 'line' })
+  end,
+})
 
-vim.opt.splitright = true
-vim.opt.splitbelow = true
+vim.api.nvim_set_hl(0, 'TelescopePromptPrefix', { fg = '#e06c75' })
 
-vim.opt.inccommand = 'split'
-
-vim.opt.cursorline = true
-vim.opt.scrolloff = 10
 -- next two are to add blank lines above without going into insert mode
 vim.keymap.set('n', '<CR>', 'm`o<Esc>``')
 vim.keymap.set('n', '<S-CR>', 'm`O<Esc>``')
@@ -134,9 +142,7 @@ local one_dark_theme = {
 require('lazy').setup({
   {
     'MeanderingProgrammer/render-markdown.nvim',
-    dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.nvim' }, -- if you use the mini.nvim suite
-    -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.icons' }, -- if you use standalone mini plugins
-    -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
+    dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.nvim' },
     ---@module 'render-markdown'
     ---@type render.md.UserConfig
     opts = {},
@@ -167,13 +173,13 @@ require('lazy').setup({
   --     },
   --   },
   -- },
-  {
-    'refractalize/oil-git-status.nvim',
-    dependencies = {
-      'stevearc/oil.nvim',
-    },
-    config = true,
-  },
+  -- {
+  --   'refractalize/oil-git-status.nvim',
+  --   dependencies = {
+  --     'stevearc/oil.nvim',
+  --   },
+  --   config = true,
+  -- },
   'tpope/vim-fugitive',
   'tpope/vim-sleuth',
   {
@@ -271,6 +277,7 @@ require('lazy').setup({
           file_ignore_patterns = {
             'node_modules',
             '.git',
+            'cmt',
           },
         },
         pickers = {
@@ -304,7 +311,7 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
       vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
       vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
-      vim.keymap.set('n', '<leader><leader>', ":lua require('telescope.builtin').buffers({ sort_mru = true })<CR>", { desc = '[ ] Find existing buffers' })
+      vim.keymap.set('n', '<leader>b', ":lua require('telescope.builtin').buffers({ sort_mru = true })<CR>", { desc = '[ ] Find existing buffers' })
 
       vim.keymap.set('n', '<leader>s/', function()
         builtin.live_grep {
@@ -603,6 +610,7 @@ require('lazy').setup({
       }
       require('mini.surround').setup()
       require('mini.files').setup()
+      vim.keymap.set('n', '<leader>e', '<cmd>lua MiniFiles.open()<CR>')
     end,
   },
   {
@@ -688,15 +696,5 @@ require('lazy').setup({
     },
   },
 })
-vim.diagnostic.config {
-  virtual_text = false,
-}
-vim.api.nvim_create_autocmd('CursorHold', {
-  callback = function()
-    vim.diagnostic.open_float(nil, { focusable = false, scope = 'line' })
-  end,
-})
-vim.api.nvim_set_hl(0, 'TelescopePromptPrefix', { fg = '#e06c75' })
-
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
